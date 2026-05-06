@@ -1,0 +1,95 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Fixed Effects Regression Results}
+\author{DERS Analysis}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Overview}
+
+This note reports the results from the Stata fixed effects regression in
+\texttt{ders- analysis.do}. The analysis uses a simulated balanced panel with
+100 units observed annually from 2015 through 2024, for a total of 1,000
+observations. The data-generating process is
+
+\begin{equation}
+    y_{it} = 1.5x_{it} + \alpha_i + \lambda_t + \varepsilon_{it},
+\end{equation}
+
+where $\alpha_i$ is a unit fixed effect, $\lambda_t$ is a time effect, and
+$\varepsilon_{it}$ is an idiosyncratic error term.
+
+\section{Specification}
+
+The estimated model is
+
+\begin{equation}
+    y_{it} = \beta x_{it} + \lambda_t + \alpha_i + u_{it}.
+\end{equation}
+
+The regression is estimated using Stata's \texttt{xtreg, fe} command with year
+fixed effects and standard errors clustered by unit:
+
+\begin{verbatim}
+xtreg y x i.year, fe vce(cluster id)
+\end{verbatim}
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Variable & Coefficient & Std. Error & $t$-statistic & $p$-value \\
+\midrule
+$x$ & 1.5366 & 0.0329 & 46.74 & 0.000 \\
+\bottomrule
+\end{tabular}
+\caption{Fixed effects regression result for $x$}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lc}
+\toprule
+Statistic & Value \\
+\midrule
+Observations & 1,000 \\
+Groups & 100 \\
+Within $R^2$ & 0.7257 \\
+Between $R^2$ & 0.2068 \\
+Overall $R^2$ & 0.5737 \\
+Clustered standard errors & Yes, by unit \\
+Year fixed effects & Yes \\
+Unit fixed effects & Yes \\
+\bottomrule
+\end{tabular}
+\caption{Model summary}
+\end{table}
+
+\section{Interpretation}
+
+The estimated coefficient on $x$ is 1.5366. Because the simulated true effect is
+1.5, the fixed effects estimator recovers the underlying parameter closely. The
+coefficient is precisely estimated, with a clustered standard error of 0.0329
+and a $p$-value below 0.001.
+
+The within $R^2$ of 0.7257 indicates that the model explains a large share of
+within-unit variation in the dependent variable. The estimate is based on
+within-unit changes over time, while controlling for time-invariant unit
+characteristics and common year effects.
+
+\section{Conclusion}
+
+The Stata fixed effects regression confirms that the panel estimator recovers
+the simulated relationship between $x$ and $y$. After accounting for unit fixed
+effects, year fixed effects, and clustered standard errors, the estimated effect
+of $x$ remains close to the true value used to generate the data.
+
+\end{document}

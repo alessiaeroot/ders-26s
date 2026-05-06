@@ -1,0 +1,139 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/alessiaroot/Desktop/ders-26s/ders-analysis.log
+  log type:  text
+ opened on:   6 May 2026, 11:03:49
+
+. 
+. * ============================================
+. * Create balanced panel data
+. * ============================================
+. 
+. local n_units = 100
+
+. local n_periods = 10
+
+. local beta = 1.5
+
+. 
+. set obs `n_units'
+Number of observations (_N) was 0, now 100.
+
+. gen id = _n
+
+. gen unit_fe = rnormal(0, 1)
+
+. 
+. expand `n_periods'
+(900 observations created)
+
+. bysort id: gen year = 2015 + _n - 1
+
+. 
+. gen x = rnormal(0, 1)
+
+. gen e = rnormal(0, 1)
+
+. gen time_fe = 0.20 * (year - 2015)
+
+. gen y = `beta' * x + unit_fe + time_fe + e
+
+. 
+. xtset id year
+
+Panel variable: id (strongly balanced)
+ Time variable: year, 2015 to 2024
+         Delta: 1 unit
+
+. 
+. * ============================================
+. * Fixed effects regression
+. * ============================================
+. 
+. xtreg y x i.year, fe vce(cluster id)
+
+Fixed-effects (within) regression               Number of obs     =      1,000
+Group variable: id                              Number of groups  =        100
+
+R-squared:                                      Obs per group:
+     Within  = 0.7257                                         min =         10
+     Between = 0.2068                                         avg =       10.0
+     Overall = 0.5737                                         max =         10
+
+                                                F(10, 99)         =     250.22
+corr(u_i, Xb) = 0.0171                          Prob > F          =     0.0000
+
+                                   (Std. err. adjusted for 100 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+           x |   1.536577   .0328742    46.74   0.000     1.471348    1.601807
+             |
+        year |
+       2016  |    .194728   .1392313     1.40   0.165    -.0815371    .4709931
+       2017  |   .4075281   .1544804     2.64   0.010     .1010055    .7140508
+       2018  |   .4472401      .1441     3.10   0.002     .1613144    .7331658
+       2019  |   .7121639   .1422585     5.01   0.000     .4298921    .9944358
+       2020  |   1.052791   .1242374     8.47   0.000     .8062773    1.299305
+       2021  |    1.03461   .1574072     6.57   0.000     .7222802     1.34694
+       2022  |   1.219342   .1552115     7.86   0.000     .9113682    1.527315
+       2023  |    1.58369   .1316842    12.03   0.000       1.3224     1.84498
+       2024  |   1.737446   .1283133    13.54   0.000     1.482845    1.992047
+             |
+       _cons |   .1741619   .0948896     1.84   0.069    -.0141197    .3624435
+-------------+----------------------------------------------------------------
+     sigma_u |  1.0436638
+     sigma_e |  1.0074526
+         rho |  .51764889   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. estimates store fe_model
+
+. 
+. * Save a compact results table.
+. estimates table fe_model, b(%9.3f) se(%9.3f) stats(N r2_w r2_b r2_o)
+
+--------------------------
+    Variable | fe_model   
+-------------+------------
+           x |     1.537  
+             |     0.033  
+             |
+        year |
+       2016  |     0.195  
+             |     0.139  
+       2017  |     0.408  
+             |     0.154  
+       2018  |     0.447  
+             |     0.144  
+       2019  |     0.712  
+             |     0.142  
+       2020  |     1.053  
+             |     0.124  
+       2021  |     1.035  
+             |     0.157  
+       2022  |     1.219  
+             |     0.155  
+       2023  |     1.584  
+             |     0.132  
+       2024  |     1.737  
+             |     0.128  
+             |
+       _cons |     0.174  
+             |     0.095  
+-------------+------------
+           N |      1000  
+        r2_w |     0.726  
+        r2_b |     0.207  
+        r2_o |     0.574  
+--------------------------
+              Legend: b/se
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/alessiaroot/Desktop/ders-26s/ders-analysis.log
+  log type:  text
+ closed on:   6 May 2026, 11:03:49
+-------------------------------------------------------------------------------

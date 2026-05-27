@@ -1,0 +1,5 @@
+FRED data refreshed on 2026-05-26.
+Latest nominal GDP annual observation: 2025-01-01: 30762.099 billions.
+Latest unemployment rate observation: 2026-04-01: 4.3%.
+Latest CPI observation: 2026-04-01.
+Latest core CPI observation: 2026-04-01.

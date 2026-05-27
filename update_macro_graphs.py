@@ -80,6 +80,16 @@ def tex_escape(s):
 
 
 COLORS = ["blue", "red", "green!60!black", "orange!80!black", "purple", "cyan!60!black"]
+AXIS_SIZE = [
+    "width=6.4in",
+    "height=4.8in",
+    "grid=major",
+    "major grid style={densely dotted, gray!70}",
+    "axis line style={gray!70}",
+    "tick label style={font=\\large, /pgf/number format/fixed, /pgf/number format/precision=0, /pgf/number format/1000 sep={}}",
+    "label style={font=\\Large}",
+    "title style={font=\\LARGE, text=blue!35!black}",
+]
 
 
 def compile_tex(base, body):
@@ -110,21 +120,19 @@ def compile_tex(base, body):
 
 def line_graph(base, title, ylabel, data_path, series, xmin=None, logy=False):
     opts = [
-        "width=11.2in",
-        "height=6.2in",
-        "grid=major",
-        "tick label style={font=\\small}",
-        "label style={font=\\small}",
+        *AXIS_SIZE,
         f"title={{{tex_escape(title)}}}",
         f"ylabel={{{tex_escape(ylabel)}}}",
         "xlabel={Year}",
-        "legend style={font=\\small, at={(0.02,0.98)}, anchor=north west, fill=white, draw=none}",
+        "xtick distance=5",
+        "legend style={font=\\Large, at={(1.02,0.05)}, anchor=south west, fill=white, draw=none}",
         "unbounded coords=jump",
     ]
     if xmin is not None:
         opts.append(f"xmin={xmin}")
     if logy:
         opts.append("ymode=log")
+        opts.append("log ticks with fixed point")
     body = "\\begin{tikzpicture}\n\\begin{axis}[" + ",".join(opts) + "]\n"
     legends = []
     for i, (col, label) in enumerate(series):
@@ -138,15 +146,13 @@ def line_graph(base, title, ylabel, data_path, series, xmin=None, logy=False):
 
 def bar_graph(base, title, ylabel, data_path, col, xmin=None):
     opts = [
-        "width=11.2in",
-        "height=6.2in",
-        "grid=major",
+        *AXIS_SIZE,
         "ybar",
         "bar width=1.5pt",
-        "tick label style={font=\\small}",
         f"title={{{tex_escape(title)}}}",
         f"ylabel={{{tex_escape(ylabel)}}}",
         "xlabel={Year}",
+        "xtick distance=5",
         "unbounded coords=jump",
     ]
     if xmin is not None:
@@ -160,10 +166,10 @@ def bar_graph(base, title, ylabel, data_path, col, xmin=None):
 def scatter_fit_graph(base, title, ylabel, data_path, slope, intercept, xmin, xmax):
     body = rf"""\begin{{tikzpicture}}
 \begin{{axis}}[
-width=11.2in,height=6.2in,grid=major,
+width=6.4in,height=4.8in,grid=major,major grid style={{densely dotted, gray!70}},
 title={{{tex_escape(title)}}}, xlabel={{Change in Unemployment Rate}}, ylabel={{{tex_escape(ylabel)}}},
-tick label style={{font=\small}}, label style={{font=\small}},
-legend style={{draw=none, fill=white, at={{(0.02,0.98)}}, anchor=north west}},
+tick label style={{font=\large, /pgf/number format/fixed, /pgf/number format/precision=0, /pgf/number format/1000 sep={{}}}}, label style={{font=\Large}}, title style={{font=\LARGE, text=blue!35!black}},
+legend style={{draw=none, fill=white, font=\Large, at={{(1.02,0.05)}}, anchor=south west}},
 ]
 \addplot+[only marks, mark=*, mark size=1.1pt, color=blue] table [x=x, y=y, col sep=comma] {{{data_path}}};
 \addlegendentry{{observations}}
@@ -180,18 +186,19 @@ def group_two_graph(base, title, ylabel, data_path, left_col, left_title, right_
     body = rf"""\begin{{tikzpicture}}
 \begin{{groupplot}}[
 group style={{group size=2 by 1, horizontal sep=1.2cm}},
-width=5.4in,height=5.9in,grid=major,
-tick label style={{font=\small}}, label style={{font=\small}},
+width=3.1in,height=4.45in,grid=major,major grid style={{densely dotted, gray!70}},
+tick label style={{font=\large, /pgf/number format/fixed, /pgf/number format/precision=0, /pgf/number format/1000 sep={{}}}}, label style={{font=\Large}},
 ylabel={{{tex_escape(ylabel)}}}, xlabel={{Year}},
-title style={{font=\large}},
+title style={{font=\Large, text=blue!35!black}},
 unbounded coords=jump{xmin_opt}
+,xtick distance=5
 ]
 \nextgroupplot[title={{{tex_escape(left_title)}}}]
 \addplot+[mark=none, very thick, color=blue] table [x=x, y={left_col}, col sep=comma] {{{data_path}}};
 \nextgroupplot[title={{{tex_escape(right_title)}}}]
 \addplot+[mark=none, very thick, color=red] table [x=x, y={right_col}, col sep=comma] {{{data_path}}};
 \end{{groupplot}}
-\node[font=\Large] at ($(group c1r1.north)!0.5!(group c2r1.north)+(0,0.55cm)$) {{{tex_escape(title)}}};
+\node[font=\LARGE, text=blue!35!black] at ($(group c1r1.north)!0.5!(group c2r1.north)+(0,0.55cm)$) {{{tex_escape(title)}}};
 \end{{tikzpicture}}
 """
     compile_tex(base, body)
